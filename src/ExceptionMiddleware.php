@@ -12,8 +12,10 @@ namespace Eureka\Middleware\ExceptionMiddleware;
 use Eureka\Component\Config\Config;
 use Eureka\Component\Container\Container;
 use Eureka\Component\Http\Message\Response;
+use Eureka\Component\Http\Server;
 use Eureka\Component\Psr\Http\Middleware\DelegateInterface;
 use Eureka\Component\Psr\Http\Middleware\ServerMiddlewareInterface;
+use Eureka\Component\Routing\Route;
 use Eureka\Middleware\Routing\Exception\RouteNotFoundException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -103,6 +105,20 @@ class ExceptionMiddleware implements ServerMiddlewareInterface
             $content = $twig->render('@template/Common/Content/' . $httpCode . '.twig', ['exceptionDetail' => $exceptionDetail]);
 
         } else {
+
+            /** @var \Eureka\Component\Routing\RouteCollection $routing */
+            $routing = Container::getInstance()->get('routing');
+            if (! $routing->get('error404') instanceof  Route) {
+                $routing->addFromConfig(Container::getInstance()->get('global.routing'));
+            }
+
+            if ($exception instanceof RouteNotFoundException) {
+                Server::getInstance()->redirect($routing->get('error404')->getUri());
+            }
+
+            Server::getInstance()->redirect($routing->get('error500')->getUri());
+
+            exit(0);
 
             //~ Basic html response error
             $content = '<pre>exception: ' . PHP_EOL . $exception->getMessage() . PHP_EOL . $exceptionDetail. '</pre>';

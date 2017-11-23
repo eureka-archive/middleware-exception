@@ -1,0 +1,21 @@
+{
+  "name": "eureka/middleware-exception",
+  "description": "Middleware to catch exception.",
+  "type": "library",
+  "license": "MIT",
+
+  "authors": [
+    {
+      "name": "Romain Cottard",
+      "role": "Developer"
+    }
+
+  ],
+
+  "autoload": {
+    "psr-4": {
+      "Eureka\\Middleware\\ExceptionMiddleware\\": "./src"
+    }
+  }
+
+}
